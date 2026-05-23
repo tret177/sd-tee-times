@@ -1,0 +1,21 @@
+# Secrets — NEVER commit these. The ntfy topic in alerts.json is effectively
+# a password; if someone finds the published topic they can read your alerts.
+alerts.json
+
+# Internal state — local-only
+.times.prev.json
+.refresh.log
+
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Machine-specific (has hardcoded /Users/tret177/ paths)
+com.tret177.teetimes.plist
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp

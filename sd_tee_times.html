@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Fairway · San Diego Tee Time Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1a14;
+    --paper: #f4efe4;
+    --paper-2: #ebe4d3;
+    --grass: #1f4a2c;
+    --grass-dark: #143620;
+    --grass-light: #2d6b40;
+    --moss: #5a7a3e;
+    --flag: #b8311a;
+    --flag-dark: #8a1f0c;
+    --sand: #d9c896;
+    --sky: #6a8aa3;
+    --muted: #6b6452;
+    --rule: #1f1a10;
+    --shadow: rgba(15, 26, 20, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); color: var(--ink); }
+  body {
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(31, 74, 44, 0.04), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(184, 49, 26, 0.03), transparent 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  /* paper grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+
+  /* MASTHEAD */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 18px 0 14px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px;
+  }
+  .masthead-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .masthead-meta span { display: block; }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    font-style: italic;
+  }
+  .wordmark .amp { font-style: italic; color: var(--flag); }
+  .masthead-meta.right { text-align: right; }
+
+  /* HEADLINE */
+  .headline {
+    padding: 36px 0 8px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--flag);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::after {
+    content: ''; flex: 1; height: 1px; background: var(--ink); opacity: 0.2;
+  }
+  .headline h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(40px, 7vw, 88px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+  }
+  .headline h1 em {
+    font-style: italic;
+    color: var(--grass);
+  }
+  .deck {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: clamp(15px, 1.5vw, 19px);
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 720px;
+    margin-bottom: 22px;
+    line-height: 1.45;
+  }
+
+  /* DISCLOSURE STRIP */
+  .disclosure {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    margin: 18px 0 0;
+    display: flex; align-items: center; gap: 12px;
+    border-radius: 2px;
+  }
+  .disclosure-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--flag);
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(184, 49, 26, 0.5); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(184, 49, 26, 0); }
+  }
+
+  /* CONTROLS */
+  .controls {
+    padding: 26px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 18px;
+    border-bottom: 1px solid var(--ink);
+    align-items: end;
+  }
+  .control-group label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .control-group select,
+  .control-group input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    padding: 6px 0;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%230f1a14' fill='none' stroke-width='1.5'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+  }
+  .control-group input { background-image: none; cursor: text; }
+  .control-group select:focus,
+  .control-group input:focus { border-bottom-color: var(--flag); }
+  .price-range {
+    display: flex; gap: 6px; align-items: center;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+  }
+  .price-range input[type="range"] {
+    appearance: none; -webkit-appearance: none;
+    width: 100%; height: 2px; background: var(--ink); cursor: pointer;
+    margin-top: 4px;
+  }
+  .price-range input[type="range"]::-webkit-slider-thumb {
+    appearance: none; -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--flag); cursor: pointer;
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--ink);
+  }
+  .refresh-btn {
+    background: var(--grass);
+    color: var(--paper);
+    border: none;
+    padding: 12px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .refresh-btn:hover { background: var(--grass-dark); }
+  .refresh-btn:active { transform: translateY(1px); }
+
+  /* SUMMARY BAR */
+  .summary-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--ink);
+    flex-wrap: wrap; gap: 12px;
+  }
+  .summary-bar .stats {
+    display: flex; gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .stats .stat strong {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    display: block;
+    color: var(--grass);
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .stats .stat span {
+    color: var(--muted);
+  }
+  .sort-control {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .sort-control select {
+    background: transparent; border: 1px solid var(--ink);
+    padding: 4px 8px; font-family: inherit; font-size: inherit;
+    text-transform: inherit; letter-spacing: inherit;
+    cursor: pointer; color: var(--ink);
+  }
+
+  /* COURSE LIST */
+  .courses {
+    padding: 24px 0 80px;
+  }
+  .course {
+    border-bottom: 1px solid rgba(15, 26, 20, 0.15);
+    padding: 28px 0;
+    display: grid;
+    grid-template-columns: minmax(0, 280px) 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .course:last-child { border-bottom: none; }
+
+  .course-info h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+  .course-info .area {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .course-meta {
+    display: flex; flex-wrap: wrap; gap: 6px 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 7px;
+    border: 1px solid var(--ink);
+    border-radius: 1px;
+  }
+  .badge.muni { background: var(--grass); color: var(--paper); border-color: var(--grass); }
+  .badge.resort { background: var(--flag); color: var(--paper); border-color: var(--flag); }
+  .badge.daily { background: transparent; }
+  .badge.live {
+    background: var(--ink); color: #b6ffb6; border-color: var(--ink);
+    font-weight: 700;
+  }
+  .badge.sim {
+    background: transparent; color: var(--muted); border-color: var(--muted);
+    border-style: dashed;
+  }
+  .disclosure code {
+    background: rgba(255,255,255,0.15); padding: 1px 6px; border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  }
+  .course-info .desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+  .course-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 10px;
+    border: 1px solid var(--ink);
+    transition: all 0.15s;
+  }
+  .course-link:hover { background: var(--ink); color: var(--paper); }
+  .course-link svg { width: 10px; height: 10px; }
+
+  /* TEE TIMES GRID */
+  .tee-times {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .tee-time {
+    background: var(--paper-2);
+    border: 1px solid rgba(15, 26, 20, 0.2);
+    padding: 10px 12px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .tee-time::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--moss);
+    transition: width 0.2s;
+  }
+  .tee-time:hover {
+    background: var(--paper);
+    border-color: var(--ink);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .tee-time:hover::before { width: 5px; background: var(--grass); }
+  .tee-time .time {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .tee-time .time .ampm {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+  .tee-time .price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--grass);
+  }
+  .tee-time .players {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+  .tee-time.twilight::before { background: var(--sky); }
+  .tee-time.twilight:hover::before { background: var(--sky); }
+  .tee-time.premium::before { background: var(--flag); }
+  .tee-time.premium:hover::before { background: var(--flag-dark); }
+
+  .no-times {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--muted);
+    padding: 16px 0;
+    font-size: 14px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 2px solid var(--ink);
+    padding: 24px 0 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    display: flex; justify-content: space-between; gap: 24px;
+    flex-wrap: wrap;
+  }
+  footer .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  footer .legend-item {
+    display: flex; align-items: center; gap: 6px;
+  }
+  footer .legend-swatch {
+    width: 10px; height: 10px;
+  }
+
+  @media (max-width: 780px) {
+    .container { padding: 0 18px; }
+    .controls { grid-template-columns: 1fr 1fr; }
+    .controls .refresh-btn { grid-column: span 2; }
+    .course { grid-template-columns: 1fr; gap: 18px; }
+    .summary-bar .stats { gap: 18px; }
+    .stats .stat strong { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="masthead">
+    <div class="masthead-meta">
+      <span>Vol. 1 · No. 1</span>
+      <span id="dateString">—</span>
+    </div>
+    <h1 class="wordmark">The Fairway</h1>
+    <div class="masthead-meta right">
+      <span>San Diego County</span>
+      <span>Independent Daily</span>
+    </div>
+  </header>
+
+  <section class="headline">
+    <div class="eyebrow">Tee Time Index · Live Aggregation</div>
+    <h1>Every open tee time<br/>in <em>America's Finest</em> city.</h1>
+    <p class="deck">A single broadsheet for the morning round. Every public golf course in San Diego County, every available slot, every price — pulled together so you stop tab-hopping and start swinging.</p>
+    <div class="disclosure">
+      <div class="disclosure-dot"></div>
+      <span id="disclosureText">Prototype build · Tee times shown are simulated for demonstration. Booking links go to each course's real reservation system.</span>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="control-group">
+      <label for="dateInput">Date</label>
+      <input type="date" id="dateInput" />
+    </div>
+    <div class="control-group">
+      <label for="players">Players</label>
+      <select id="players">
+        <option value="1">1 player</option>
+        <option value="2">2 players</option>
+        <option value="3">3 players</option>
+        <option value="4" selected>4 players</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="maxPrice">Max price · <span id="maxPriceLabel">$300</span></label>
+      <div class="price-range">
+        <input type="range" id="maxPrice" min="30" max="350" step="10" value="300" />
+      </div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn">↻ Refresh Times</button>
+  </section>
+
+  <section class="summary-bar">
+    <div class="stats">
+      <div class="stat"><strong id="statCourses">—</strong><span>courses listed</span></div>
+      <div class="stat"><strong id="statTimes">—</strong><span>open tee times</span></div>
+      <div class="stat"><strong id="statCheapest">—</strong><span>cheapest round</span></div>
+    </div>
+    <div class="sort-control">
+      <label for="sortBy">Sort:</label>
+      <select id="sortBy">
+        <option value="name">Course name</option>
+        <option value="price">Cheapest first</option>
+        <option value="count">Most availability</option>
+        <option value="area">By area</option>
+      </select>
+    </div>
+  </section>
+
+  <main class="courses" id="coursesList"></main>
+
+  <footer>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background: var(--moss);"></div>Standard</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: var(--sky);"></div>Twilight</div>
+      <div class="legend-item"><div class="legend-swatch" style="background: var(--flag);"></div>Premium / Weekend</div>
+    </div>
+    <div>Set · Print · Swing · © The Fairway · A demonstration build</div>
+  </footer>
+</div>
+
+<script>
+  // ──────────────────────────────────────────────────────────
+  // COURSE DATABASE — public courses across San Diego County
+  // Booking URLs go to each course's actual reservation system.
+  // ──────────────────────────────────────────────────────────
+  const COURSES = [
+    {
+      key: "torrey_south",
+      name: "Torrey Pines — South",
+      area: "La Jolla",
+      type: "muni",
+      tags: ["Championship", "PGA Tour"],
+      desc: "Host of the US Open and Farmers Insurance Open. Bluff-top par 72 along the Pacific.",
+      booking: "https://sandiego.book.teeitup.com/?course=2425",
+      base: 250, weekendBump: 40, twilightDiscount: 90,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      key: "torrey_north",
+      name: "Torrey Pines — North",
+      area: "La Jolla",
+      type: "muni",
+      tags: ["Championship"],
+      desc: "Recently renovated by Tom Weiskopf. Slightly more forgiving than its sister, with the same ocean views.",
+      booking: "https://sandiego.book.teeitup.com/?course=2424",
+      base: 165, weekendBump: 30, twilightDiscount: 60,
+      timeRange: [6.5, 15]
+    },
+    {
+      key: "balboa",
+      name: "Balboa Park Golf Course",
+      area: "Balboa Park",
+      type: "muni",
+      tags: ["Historic", "Par 72"],
+      desc: "The oldest public course in San Diego. Skyline views from the heart of the city.",
+      booking: "https://sandiego.book.teeitup.com/?course=2422",
+      base: 56, weekendBump: 14, twilightDiscount: 22,
+      timeRange: [6, 15]
+    },
+    {
+      key: "mission_bay",
+      name: "Mission Bay Golf Course",
+      area: "Mission Bay",
+      type: "muni",
+      tags: ["Executive", "Lighted"],
+      desc: "Ted Robinson–designed bayfront executive course. Night play available.",
+      booking: "https://sandiego.book.teeitup.com/?course=2423",
+      base: 36, weekendBump: 8, twilightDiscount: 14,
+      timeRange: [6.5, 19]
+    },
+    {
+      key: "coronado",
+      name: "Coronado Municipal",
+      area: "Coronado",
+      type: "muni",
+      tags: ["Par 72", "Bay views"],
+      desc: "One of the country's best-valued public courses. Views of the bridge and downtown.",
+      booking: "https://www.golfcoronado.com/teetimes",
+      base: 50, weekendBump: 10, twilightDiscount: 20,
+      timeRange: [6, 15]
+    },
+    {
+      name: "Mission Trails",
+      area: "San Carlos",
+      type: "daily",
+      tags: ["Par 71", "1964"],
+      desc: "William P. Bell layout with back-nine views over Lake Murray.",
+      booking: "https://www.missiontrailsgc.com/",
+      base: 64, weekendBump: 15, twilightDiscount: 25,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      name: "Riverwalk Golf Club",
+      area: "Mission Valley",
+      type: "daily",
+      tags: ["27 holes", "Ted Robinson"],
+      desc: "Three nines threaded through palm and eucalyptus along the San Diego River.",
+      booking: "https://www.riverwalkgc.com/teetimes",
+      base: 89, weekendBump: 30, twilightDiscount: 40,
+      timeRange: [6.5, 14]
+    },
+    {
+      name: "The Loma Club",
+      area: "Point Loma",
+      type: "daily",
+      tags: ["Par 30", "9 holes"],
+      desc: "Hip, walkable nine on historic grounds. Bar, grill, and live music.",
+      booking: "https://www.thelomaclub.com/",
+      base: 30, weekendBump: 6, twilightDiscount: 8,
+      timeRange: [7, 17]
+    },
+    {
+      name: "The Crossings at Carlsbad",
+      area: "Carlsbad",
+      type: "muni",
+      tags: ["Greg Nash", "Coastal"],
+      desc: "Dramatic Carlsbad muni with three bridge crossings and ocean glimpses.",
+      booking: "https://www.thecrossingsatcarlsbad.com/",
+      base: 110, weekendBump: 40, twilightDiscount: 45,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      name: "The Links at Lakehouse",
+      area: "San Marcos",
+      type: "resort",
+      tags: ["Resort", "Par 71"],
+      desc: "Lakeside resort course at Lakehouse Hotel. Public welcome.",
+      booking: "https://www.lakehousehotelandresort.com/golf/",
+      base: 85, weekendBump: 25, twilightDiscount: 35,
+      timeRange: [6.5, 14]
+    },
+    {
+      name: "Encinitas Ranch",
+      area: "Encinitas",
+      type: "daily",
+      tags: ["Par 72", "Cary Bickler"],
+      desc: "Bluff-top North County course with sweeping coastal panoramas.",
+      booking: "https://www.jcgolf.com/encinitas-ranch-golf-course",
+      base: 95, weekendBump: 30, twilightDiscount: 40,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      name: "Twin Oaks Golf Course",
+      area: "San Marcos",
+      type: "daily",
+      tags: ["Par 72", "Ted Robinson"],
+      desc: "Mature inland course with rolling fairways and lakes in play on six holes.",
+      booking: "https://www.jcgolf.com/twin-oaks-golf-course",
+      base: 75, weekendBump: 25, twilightDiscount: 30,
+      timeRange: [6.5, 14]
+    },
+    {
+      name: "Carmel Mountain Ranch",
+      area: "Rancho Bernardo",
+      type: "daily",
+      tags: ["Par 72"],
+      desc: "Classic Ron Fream design winding through the canyons of north county inland.",
+      booking: "https://www.cmrgolf.com/",
+      base: 80, weekendBump: 25, twilightDiscount: 30,
+      timeRange: [6.5, 14]
+    },
+    {
+      name: "Sycuan — Oak Glen",
+      area: "El Cajon",
+      type: "resort",
+      tags: ["Resort", "Par 71"],
+      desc: "Mature oaks and elevated tees at Sycuan's flagship championship course.",
+      booking: "https://www.sycuan.com/golf",
+      base: 95, weekendBump: 25, twilightDiscount: 35,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      name: "Sycuan — Willow Glen",
+      area: "El Cajon",
+      type: "resort",
+      tags: ["Resort", "Par 72"],
+      desc: "The longer of Sycuan's two championship courses. Generous fairways, water on eight.",
+      booking: "https://www.sycuan.com/golf",
+      base: 95, weekendBump: 25, twilightDiscount: 35,
+      timeRange: [6.5, 14.5]
+    },
+    {
+      name: "Maderas Golf Club",
+      area: "Poway",
+      type: "daily",
+      tags: ["Upscale", "Johnny Miller"],
+      desc: "Johnny Miller–designed daily-fee in the hills above Poway. A bucket-lister.",
+      booking: "https://www.maderasgolf.com/",
+      base: 195, weekendBump: 50, twilightDiscount: 75,
+      timeRange: [7, 14]
+    },
+    {
+      name: "The Grand Golf Club",
+      area: "Rancho Bernardo",
+      type: "resort",
+      tags: ["Resort", "Tom Fazio"],
+      desc: "Tom Fazio resort course at Fairmont Grand Del Mar. Among the country's top resort tracks.",
+      booking: "https://www.fairmont-grand-del-mar.com/golf/",
+      base: 295, weekendBump: 55, twilightDiscount: 95,
+      timeRange: [7, 14]
+    },
+    {
+      name: "Aviara Golf Club",
+      area: "Carlsbad",
+      type: "resort",
+      tags: ["Resort", "Arnold Palmer"],
+      desc: "Palmer design at Park Hyatt Aviara. Lagoons, bunkering, and Pacific breezes.",
+      booking: "https://www.parkhyattaviara.com/golf",
+      base: 275, weekendBump: 50, twilightDiscount: 90,
+      timeRange: [7, 14]
+    }
+  ];
+
+  // ──────────────────────────────────────────────────────────
+  // LIVE DATA LOADER
+  // Tries to fetch ./times.json (produced by the Python scraper).
+  // If present, real scraped times for the muni courses override
+  // the simulated ones; everything else stays simulated.
+  //
+  // The scraper writes a multi-date snapshot:
+  //   { date, dates_scraped: [...], players, scraped_at, tee_times: [...] }
+  // We index slots by `course_key|date` so the dashboard can answer
+  // "do we have live data for THIS course on THIS date" in O(1).
+  // ──────────────────────────────────────────────────────────
+  let LIVE_DATA = null; // { ...raw, datesScraped: string[], byKeyDate: { 'key|YYYY-MM-DD': [times] } }
+
+  async function loadLiveData() {
+    try {
+      const res = await fetch('./times.json', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      // Back-compat: older single-date snapshots have only `date`.
+      const datesScraped = data.dates_scraped || (data.date ? [data.date] : []);
+      const byKeyDate = {};
+      for (const t of (data.tee_times || [])) {
+        const k = t.course_key + '|' + t.date;
+        if (!byKeyDate[k]) byKeyDate[k] = [];
+        byKeyDate[k].push(t);
+      }
+      return { ...data, datesScraped, byKeyDate };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function liveTimesForCourse(course, dateStr, players, maxPrice) {
+    if (!LIVE_DATA) return null;
+    // We have authoritative info iff the scraper covered this date.
+    if (!LIVE_DATA.datesScraped.includes(dateStr)) return null;
+    // Empty array is a legitimate answer ("live, but no slots match") —
+    // it should still override the simulation.
+    const dayTimes = LIVE_DATA.byKeyDate[course.key + '|' + dateStr] || [];
+    const slots = dayTimes
+      .filter(t => t.available_spots >= players)
+      .filter(t => t.price == null || t.price <= maxPrice)
+      .map(t => {
+        const [h, m] = t.time.split(':').map(Number);
+        const hrs = h + m / 60;
+        const isTwilight = hrs >= 13.5;
+        const isWeekend = (() => {
+          const d = new Date(dateStr + 'T12:00:00');
+          return d.getDay() === 0 || d.getDay() === 6;
+        })();
+        let tier = 'standard';
+        if (isTwilight) tier = 'twilight';
+        else if (isWeekend && hrs >= 7 && hrs <= 10) tier = 'premium';
+        return {
+          time: hrs,
+          price: t.price != null ? Math.round(t.price) : null,
+          slots: t.available_spots,
+          tier,
+        };
+      });
+    return slots;
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // SIMULATION (used when no live data is available)
+  // ──────────────────────────────────────────────────────────
+  function seededRandom(seed) {
+    let s = seed;
+    return () => {
+      s = (s * 1664525 + 1013904223) % 4294967296;
+      return s / 4294967296;
+    };
+  }
+  function hashStr(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+  function formatTime(hrs) {
+    const totalMin = Math.round(hrs * 60);
+    let h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    if (h === 0) h = 12;
+    else if (h > 12) h -= 12;
+    return { hour: h, minute: m.toString().padStart(2, '0'), ampm };
+  }
+  function isWeekend(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  }
+  function generateTimesForCourse(course, dateStr, refreshKey) {
+    const seed = hashStr(course.name + dateStr + refreshKey);
+    const rnd = seededRandom(seed);
+    const weekend = isWeekend(dateStr);
+    const [start, end] = course.timeRange;
+    const times = [];
+    // generate slots every 10-12 minutes
+    for (let t = start; t <= end; t += (10 + Math.floor(rnd() * 3)) / 60) {
+      // availability probability (lower in prime morning hours)
+      const isPrime = t >= 7 && t <= 10;
+      const isTwilightStart = t >= 13.5;
+      const availChance = weekend ? (isPrime ? 0.18 : isTwilightStart ? 0.55 : 0.4)
+                                  : (isPrime ? 0.45 : isTwilightStart ? 0.7 : 0.6);
+      if (rnd() > availChance) continue;
+
+      const tw = isTwilightStart;
+      let price = course.base + (weekend ? course.weekendBump : 0);
+      if (tw) price -= course.twilightDiscount;
+      // small jitter
+      price = Math.max(15, Math.round((price + (rnd() * 10 - 5)) / 1) );
+
+      // available slots (1-4)
+      const slots = 1 + Math.floor(rnd() * 4);
+
+      let tier = 'standard';
+      if (tw) tier = 'twilight';
+      else if (weekend && isPrime) tier = 'premium';
+
+      times.push({ time: t, price, slots, tier });
+    }
+    return times;
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // RENDERING
+  // ──────────────────────────────────────────────────────────
+  let state = {
+    date: new Date().toISOString().split('T')[0],
+    players: 4,
+    maxPrice: 300,
+    sort: 'name',
+    refreshKey: 0
+  };
+
+  function render() {
+    // date header
+    const d = new Date(state.date + 'T12:00:00');
+    const dateLong = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    document.getElementById('dateString').textContent = dateLong.toUpperCase();
+    document.getElementById('maxPriceLabel').textContent = '$' + state.maxPrice;
+
+    // update disclosure banner based on what data we have
+    updateDisclosure();
+
+    // generate all data — prefer live data per course, fall back to simulated
+    const data = COURSES.map(c => {
+      const live = liveTimesForCourse(c, state.date, state.players, state.maxPrice);
+      if (live !== null) {
+        return { course: c, times: live, isLive: true };
+      }
+      const allTimes = generateTimesForCourse(c, state.date, state.refreshKey);
+      const filtered = allTimes.filter(t => t.price <= state.maxPrice && t.slots >= state.players);
+      return { course: c, times: filtered, isLive: false };
+    });
+
+    // sort
+    if (state.sort === 'name') data.sort((a,b) => a.course.name.localeCompare(b.course.name));
+    else if (state.sort === 'price') {
+      data.sort((a,b) => {
+        const ap = a.times.length ? Math.min(...a.times.map(t => t.price)) : Infinity;
+        const bp = b.times.length ? Math.min(...b.times.map(t => t.price)) : Infinity;
+        return ap - bp;
+      });
+    } else if (state.sort === 'count') {
+      data.sort((a,b) => b.times.length - a.times.length);
+    } else if (state.sort === 'area') {
+      data.sort((a,b) => a.course.area.localeCompare(b.course.area) || a.course.name.localeCompare(b.course.name));
+    }
+
+    // stats
+    const totalTimes = data.reduce((sum, d) => sum + d.times.length, 0);
+    const allPrices = data.flatMap(d => d.times.map(t => t.price));
+    const cheapest = allPrices.length ? Math.min(...allPrices) : null;
+    const coursesWithTimes = data.filter(d => d.times.length > 0).length;
+
+    document.getElementById('statCourses').textContent = coursesWithTimes;
+    document.getElementById('statTimes').textContent = totalTimes;
+    document.getElementById('statCheapest').textContent = cheapest !== null ? '$' + cheapest : '—';
+
+    // courses
+    const list = document.getElementById('coursesList');
+    list.innerHTML = data.map(d => renderCourse(d)).join('');
+  }
+
+  function renderCourse({ course, times, isLive }) {
+    const typeBadge = course.type === 'muni' ? '<span class="badge muni">Municipal</span>'
+                    : course.type === 'resort' ? '<span class="badge resort">Resort</span>'
+                    : '<span class="badge daily">Daily fee</span>';
+    const tagBadges = course.tags.map(t => `<span class="badge">${t}</span>`).join('');
+    const dataBadge = isLive
+      ? '<span class="badge live" title="Live from booking system">● LIVE</span>'
+      : '<span class="badge sim" title="Simulated for demonstration">SIM</span>';
+
+    const timesHTML = times.length === 0
+      ? '<div class="no-times">No times match your filters. Try adjusting price or players.</div>'
+      : times.map(t => {
+          const f = formatTime(t.time);
+          const priceDisplay = t.price != null ? `$${t.price}` : 'See site';
+          return `<a href="${course.booking}" target="_blank" rel="noopener" class="tee-time ${t.tier}">
+            <div class="time">${f.hour}:${f.minute}<span class="ampm">${f.ampm}</span></div>
+            <div class="price">${priceDisplay}</div>
+            <div class="players">${t.slots} slot${t.slots>1?'s':''} open</div>
+          </a>`;
+        }).join('');
+
+    return `
+      <article class="course">
+        <div class="course-info">
+          <h2>${course.name}</h2>
+          <div class="area">${course.area}</div>
+          <div class="course-meta">${typeBadge}${dataBadge}${tagBadges}</div>
+          <p class="desc">${course.desc}</p>
+          <a href="${course.booking}" target="_blank" rel="noopener" class="course-link">
+            Open booking site
+            <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8 L8 2 M3 2 L8 2 L8 7"/></svg>
+          </a>
+        </div>
+        <div class="tee-times">${timesHTML}</div>
+      </article>
+    `;
+  }
+
+  function updateDisclosure() {
+    const el = document.getElementById('disclosureText');
+    if (!LIVE_DATA) {
+      el.innerHTML = 'No <code>times.json</code> found · All tee times shown are simulated. Run the Python scraper to populate live data for the four city munis.';
+      return;
+    }
+    const dateInWindow = LIVE_DATA.datesScraped.includes(state.date);
+    const liveCount = !dateInWindow ? 0 : COURSES.filter(c =>
+      (LIVE_DATA.byKeyDate[c.key + '|' + state.date] || []).length > 0
+    ).length;
+    const windowLabel = LIVE_DATA.datesScraped.length > 1
+      ? `${LIVE_DATA.datesScraped[0]} – ${LIVE_DATA.datesScraped[LIVE_DATA.datesScraped.length-1]}`
+      : LIVE_DATA.datesScraped[0];
+    if (!dateInWindow) {
+      el.innerHTML = `<strong>Live data covers ${windowLabel}</strong> — pick a date in that range to see real tee times. Other dates are simulated.`;
+    } else if (liveCount === 0) {
+      const scrapedAt = new Date(LIVE_DATA.scraped_at).toLocaleString('en-US',
+        { hour: 'numeric', minute: '2-digit', month: 'short', day: 'numeric' });
+      el.innerHTML = `Live for ${state.date} · No muni slots match your filters · Last scrape: ${scrapedAt}`;
+    } else {
+      const scrapedAt = new Date(LIVE_DATA.scraped_at).toLocaleString('en-US',
+        { hour: 'numeric', minute: '2-digit', month: 'short', day: 'numeric' });
+      el.innerHTML = `Live for ${liveCount} muni course${liveCount>1?'s':''} on ${state.date} · Window ${windowLabel} · Last scrape: ${scrapedAt} · Resort & daily-fee courses remain simulated.`;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // EVENTS
+  // ──────────────────────────────────────────────────────────
+  const dateInput = document.getElementById('dateInput');
+  dateInput.value = state.date;
+  dateInput.addEventListener('change', e => { state.date = e.target.value; render(); });
+  document.getElementById('players').addEventListener('change', e => { state.players = parseInt(e.target.value); render(); });
+  document.getElementById('maxPrice').addEventListener('input', e => { state.maxPrice = parseInt(e.target.value); render(); });
+  document.getElementById('sortBy').addEventListener('change', e => { state.sort = e.target.value; render(); });
+  document.getElementById('refreshBtn').addEventListener('click', async () => {
+    state.refreshKey++;
+    LIVE_DATA = await loadLiveData();
+    // If the picker is outside the live window, snap it inside.
+    if (LIVE_DATA && LIVE_DATA.datesScraped.length &&
+        !LIVE_DATA.datesScraped.includes(state.date)) {
+      state.date = LIVE_DATA.datesScraped[0];
+      dateInput.value = state.date;
+    }
+    render();
+  });
+
+  // Initial load — attempt to read live data, then render
+  (async () => {
+    LIVE_DATA = await loadLiveData();
+    // Snap the picker into the live window only if today isn't covered.
+    if (LIVE_DATA && LIVE_DATA.datesScraped.length &&
+        !LIVE_DATA.datesScraped.includes(state.date)) {
+      state.date = LIVE_DATA.datesScraped[0];
+      dateInput.value = state.date;
+    }
+    if (LIVE_DATA) {
+      if (LIVE_DATA.players) {
+        state.players = LIVE_DATA.players;
+        document.getElementById('players').value = String(LIVE_DATA.players);
+      }
+    }
+    render();
+  })();
+</script>
+
+</body>
+</html>

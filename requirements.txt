@@ -1,0 +1,3 @@
+requests>=2.31.0
+# Optional — only needed for `--mode browser`. Comment out if not using.
+playwright>=1.40.0
